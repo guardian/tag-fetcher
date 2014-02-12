@@ -1,6 +1,5 @@
 package com.gu.tagfetcher
 
-import dispatch._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -21,18 +20,17 @@ case class Section(
     slug: String
 )
 
-class TagFetcher(tagStoreUri: String) {
+class TagFetcher(tagStoreUri: String, http: Http) {
   var Tags: List[Tag] = List();
 
-  def getTags: Future[List[Tag]] = Future {
-    def tagStore = url(tagStoreUri)
+  def getTags: Future[List[Tag]] = {
+
     val headers = Map("user-agent" -> "curl") // bypass newspaper integration security
-    val request = tagStore <:< headers
+    val response = http.get(tagStoreUri, headers)
 
-    val response = Http(request).apply()
-
-    val responseXml = AsXml(response)
-      parseTags(responseXml)
+    response map { r =>
+      parseTags(AsXml(r))
+    }
   }
 
   def parseTags(tagsResponse: xml.Elem): List[Tag] = {
