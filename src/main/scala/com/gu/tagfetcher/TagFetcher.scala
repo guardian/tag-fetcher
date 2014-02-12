@@ -31,7 +31,7 @@ class TagFetcher(tagStoreUri: String) {
 
     val response = Http(request).apply()
 
-    val responseXml = AsXmlSanitised(response)
+    val responseXml = AsXml(response)
       parseTags(responseXml)
   }
 
